@@ -1,6 +1,26 @@
 # Sistema_de_controle_de_despesas_POO
 Projeto final das aulas de Programação Orientada a Objetos
 
+## Como Executar o Projeto (MVP)
+
+Este projeto usa apenas bibliotecas padrão do Java (Swing).
+
+1.  **Pré-requisito:** Ter o JDK (Java Development Kit) 8 ou superior instalado.
+2.  **Clone o repositório:**
+    ```bash
+    git clone [URL-DO-SEU-REPOSITÓRIO-AQUI]
+    ```
+3.  **Entre na pasta e compile os arquivos:**
+    ```bash
+    cd [NOME-DA-PASTA-DO-PROJETO]
+    javac *.java
+    ```
+4.  **Execute a classe principal:**
+    ```bash
+    java MenuPrincipal
+    ```
+5.  O menu principal do sistema será exibido.
+
 ## Changelog
 # Classe Menu principal
 Executa um menu simples com todas as opções do sistema atravéz de botões.
