@@ -31,9 +31,12 @@ public class MenuPrincipal extends JFrame implements ActionListener {
 
             if (!opcao.equals("Entrar despesa") &&
                     !opcao.equals("Listar despesas em aberto no período") &&
+                    !opcao.equals("Anotar pagamento") &&
+                    !opcao.equals("gerenciar tipos de despesas") &&
+                    !opcao.equals("gerenciar Usuários") &&
                     !opcao.equals("Sair")) {
 
-                botao.setEnabled(false); // Desabilita o botão
+                botao.setEnabled(false);
                 botao.setToolTipText("Disponível nas próximas versões");
             }
 
@@ -71,19 +74,26 @@ public class MenuPrincipal extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         String comando = e.getActionCommand();
-        // System.out.println("\n--- Opção selecionada: " + comando + " ---");
 
         if (comando.equals("Entrar despesa")) {
-            new TelaCadastroDespesa();
+            new TelaCadastroDespesa().setVisible(true);
 
         } else if (comando.equals("Listar despesas em aberto no período")) {
-            new TelaListarDespesas();
+            new TelaListarDespesas().setVisible(true);
+
+        } else if (comando.equals("Anotar pagamento")) {
+            new TelaAnotarPagamento().setVisible(true);
+
+        } else if (comando.equals("gerenciar tipos de despesas")) {
+            new TelaGerenciarTipos().setVisible(true);
+
+        } else if (comando.equals("gerenciar Usuários")) {
+            new TelaGerenciarUsuarios().setVisible(true);
 
         } else if (comando.equals("Sair")) {
             System.out.println("Encerrando o sistema...");
             System.exit(0);
         }
-
     }
 
     public static void main(String[] args) {

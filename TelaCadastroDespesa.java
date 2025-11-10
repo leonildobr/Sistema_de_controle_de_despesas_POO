@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Objects;
 
 public class TelaCadastroDespesa extends JDialog implements ActionListener {
 
@@ -15,6 +16,8 @@ public class TelaCadastroDespesa extends JDialog implements ActionListener {
     private JComboBox<TipoDespesa> cbTipoDespesa;
     private JButton btnSalvar;
     private JButton btnCancelar;
+
+    private Despesa despesaParaEditar;
 
     public TelaCadastroDespesa() {
         setTitle("1. Entrar Despesa (MVP)");
@@ -57,8 +60,23 @@ public class TelaCadastroDespesa extends JDialog implements ActionListener {
         painelBotoes.add(btnCancelar);
 
         add(painelBotoes, BorderLayout.SOUTH);
+    }
 
-        setVisible(true);
+    public TelaCadastroDespesa(Despesa despesaParaEditar) {
+        this();
+        setTitle("Editar Despesa");
+        this.despesaParaEditar = despesaParaEditar;
+
+        txtNome.setText(despesaParaEditar.getNome());
+        txtValor.setText(String.format("%.2f", despesaParaEditar.getValor()).replace(",", "."));
+        txtDataVencimento.setText(despesaParaEditar.getDataVencimento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+
+        for (int i = 0; i < cbTipoDespesa.getItemCount(); i++) {
+            if (cbTipoDespesa.getItemAt(i).equals(despesaParaEditar.getTipo())) {
+                cbTipoDespesa.setSelectedIndex(i);
+                break;
+            }
+        }
     }
 
     @Override
@@ -88,14 +106,20 @@ public class TelaCadastroDespesa extends JDialog implements ActionListener {
             double valor = Double.parseDouble(valorStr.replace(",", "."));
             LocalDate dataVencimento = LocalDate.parse(dataStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-            Despesa novaDespesa = new Despesa(nome, valor, dataVencimento, tipo);
-
-            GerenciadorDespesas.adicionarDespesa(novaDespesa);
-
-            JOptionPane.showMessageDialog(this,
-                    "Despesa '" + nome + "' salva com sucesso!",
-                    "Sucesso",
-                    JOptionPane.INFORMATION_MESSAGE);
+            if (despesaParaEditar == null) {
+                Despesa novaDespesa = new Despesa(nome, valor, dataVencimento, tipo);
+                GerenciadorDespesas.adicionarDespesa(novaDespesa);
+                JOptionPane.showMessageDialog(this,
+                        "Despesa '" + nome + "' salva com sucesso!",
+                        "Sucesso",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                GerenciadorDespesas.editarDespesa(despesaParaEditar, nome, valor, dataVencimento, tipo);
+                JOptionPane.showMessageDialog(this,
+                        "Despesa '" + nome + "' atualizada com sucesso!",
+                        "Sucesso",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
 
             dispose();
 

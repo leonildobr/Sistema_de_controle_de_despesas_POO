@@ -1,13 +1,27 @@
 import java.util.Objects;
 
 public class TipoDespesa {
-    private static int proximoId = 1; //
+    private static int proximoId = 1;
     private int id;
     private String nome;
 
     public TipoDespesa(String nome) {
-        this.id = proximoId++;
+        this.id = proximoId++; // Usa o contador estático
         this.nome = nome;
+    }
+
+    public TipoDespesa(int id, String nome) {
+        this.id = id;
+        this.nome = nome;
+    }
+
+    public static void setProximoId(int id) {
+        proximoId = id;
+    }
+
+    public String toFileString() {
+        // Formato: ID,Nome
+        return id + "," + nome;
     }
 
     public int getId() { return id; }

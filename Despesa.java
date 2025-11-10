@@ -1,4 +1,5 @@
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Despesa {
     private static int proximoId = 1;
@@ -22,6 +23,37 @@ public class Despesa {
         this.dataPagamento = null;
     }
 
+    public Despesa(int id, String nome, double valor, LocalDate dataVencimento, TipoDespesa tipo,
+                   LocalDate dataEmissao, boolean paga, LocalDate dataPagamento) {
+        this.id = id;
+        this.nome = nome;
+        this.valor = valor;
+        this.dataVencimento = dataVencimento;
+        this.tipo = tipo;
+        this.dataEmissao = dataEmissao;
+        this.paga = paga;
+        this.dataPagamento = dataPagamento;
+    }
+
+    public static void setProximoId(int id) {
+        proximoId = id;
+    }
+
+    public String toFileString() {
+        String dataPagStr = (dataPagamento == null) ? "null" : dataPagamento.toString();
+
+        return String.join(",",
+                String.valueOf(id),
+                nome,
+                String.valueOf(valor),
+                dataVencimento.toString(),
+                String.valueOf(tipo.getId()),
+                dataEmissao.toString(),
+                String.valueOf(paga),
+                dataPagStr
+        );
+    }
+
     public int getId() { return id; }
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
@@ -38,5 +70,23 @@ public class Despesa {
     public void marcarComoPaga(LocalDate dataPagamento) {
         this.paga = true;
         this.dataPagamento = dataPagamento;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("ID %d: %s (R$ %.2f)", this.id, this.nome, this.valor);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Despesa despesa = (Despesa) o;
+        return id == despesa.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
