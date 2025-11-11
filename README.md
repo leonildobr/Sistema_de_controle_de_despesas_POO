@@ -1,7 +1,38 @@
 # Sistema_de_controle_de_despesas_POO
-Projeto final das aulas de Programação Orientada a Objetos
+Projeto final das aulas de Programação Orientada a Objetos, um sistema completo de gestão de despesas pessoais construído em Java Swing.
 
-## Como Executar o Projeto (MVP)
+## Sobre o Projeto
+
+Este projeto é a implementação de um Sistema de Controle de Despesas completo. O que começou como um protótipo MVP (Produto Mínimo Viável) evoluiu para uma aplicação robusta que não apenas gerencia despesas, mas também implementa conceitos avançados de Programação Orientada a Objetos, como Herança, Polimorfismo e persistência de dados em arquivos.
+
+O sistema permite que o usuário gerencie múltiplas contas de usuário, cadastre despesas categorizadas (como Moradia, Alimentação, etc.), anote pagamentos e liste suas finanças com filtros.
+
+---
+
+## Funcionalidades Principais
+
+* **CRUD de Despesas:** Crie, edite e exclua despesas.
+* **Sistema de Pagamentos:** Anote pagamentos para despesas específicas, movendo-as de "Em Aberto" para "Pagas".
+* **Listagem e Filtros:** Uma tela de gerenciamento centralizada permite listar todas as despesas e filtrá-las por status (Pagas/Em Aberto) ou por Categoria (Moradia, Alimentação, etc.).
+* **Gerenciamento de Usuários:** CRUD completo de usuários, permitindo adicionar novos, editar ou excluir existentes.
+* **Segurança:** As senhas dos usuários são armazenadas de forma segura usando um hash **SHA-256**. Em nenhum momento a senha original é salva em texto.
+* **Persistência de Dados:** Todos os dados (usuários e despesas) são salvos em arquivos `.txt` na raiz do projeto, garantindo que as informações não sejam perdidas ao fechar o programa.
+
+---
+
+## Arquitetura e Conceitos de POO
+
+O maior objetivo deste projeto foi aplicar conceitos-chave de Programação Orientada a Objetos. A arquitetura foi refatorada de um modelo simples de Composição para um design mais avançado usando Herança e Interfaces:
+
+* **Classes e Herança:** A classe `Despesa` é `abstract` e serve como um molde. Classes concretas como `DespesaMoradia` e `DespesaAlimentacao` **herdam** dela, compartilhando comportamento comum.
+    * **Interfaces e Polimorfismo:** A `interface Pagavel` define um contrato para tudo que pode ser pago. As classes de Despesa a implementam. O `GerenciadorDespesas` utiliza Polimorfismo ao gerenciar uma `List<Despesa>`, que pode conter qualquer objeto que *seja uma* Despesa (como `DespesaMoradia`).
+* **Sobrecarga e Sobrescrita:** As classes de modelo (como `Usuario` e as `Despesas`) usam **construtores sobrecarregados** (um para criar novos objetos, outro para carregar do arquivo). Métodos como `toString()` e `getTipoNome()` são **sobrescritos** (`@Override`) para se adequarem a cada classe.
+* **Métodos e Atributos Estáticos:** As classes "Gerenciadoras" (`GerenciadorDespesas`, `GerenciadorUsuarios`) são compostas inteiramente de métodos e atributos `static`, agindo como serviços centralizados para o acesso e persistência de dados.
+* **Encapsulamento:** Todos os atributos das classes de modelo são `private` ou `protected`, com acesso controlado por getters e setters.
+
+---
+
+## Como Executar
 
 Este projeto usa apenas bibliotecas padrão do Java (Swing).
 
@@ -10,52 +41,21 @@ Este projeto usa apenas bibliotecas padrão do Java (Swing).
     ```bash
     git clone [URL-DO-SEU-REPOSITÓRIO-AQUI]
     ```
-3.  **Entre na pasta e compile os arquivos:**
+3.  **Entre na pasta, compile os arquivos e execute:**
     ```bash
     cd [NOME-DA-PASTA-DO-PROJETO]
     javac *.java
-    ```
-4.  **Execute a classe principal:**
-    ```bash
     java MenuPrincipal
     ```
-5.  O menu principal do sistema será exibido.
+4.  O menu principal do sistema será exibido.
 
-## Changelog
-# Classe Menu principal
-Executa um menu simples com todas as opções do sistema atravéz de botões.
-Cada botão exibe um texto no terminal de saída com informações que cada botão terá após o projeto completo.
+---
 
-## Prova de Conceito (PoC)
-A Prova de Conceito (PoC) inicial deste projeto é o arquivo MenuPrincipal.java.
+## Arquivos de Dados Gerados
 
-Ele valida a viabilidade técnica de usar a biblioteca Java Swing para construir a interface gráfica principal do sistema. O PoC demonstra um menu de navegação funcional, com múltiplos botões que respondem a eventos de clique, estabelecendo a base para a interação do usuário com as futuras funcionalidades.
+Ao executar o sistema pela primeira vez, ele criará os seguintes arquivos de texto na raiz do projeto para armazenar os dados:
 
-## Separação de Prioridades
-# Prioridade Alta (Essencial para o MVP)
-Entrar despesa: A função principal do software. Sem a capacidade de inserir dados, nenhuma outra função de controle ou relatório pode existir.
-Listar despesas em aberto no período: Permite ao usuário visualizar o que foi inserido e o que constitui suas dívidas atuais. Esta é a contrapartida essencial da entrada de dados.
-Sair: Função básica de usabilidade para fechar a aplicação. (Já implementada).
-# Prioridade Média (Importante, Pós-MVP)
-Anotar pagamento: Completa o fluxo de uma despesa (de "em aberto" para "paga").
-Listar despesas pagas no período: Relatório importante para o histórico e análise, mas secundário à visualização de dívidas pendentes.
-gerenciar tipos de despesas: Melhora a organização, mas para o MVP, os tipos de despesa (ex: "Moradia", "Lazer") podem ser pré-definidos no código sem uma tela de gerenciamento.
-# Prioridade Baixa (Complexidade Alta / Futuras Versões)
-gerenciar Usuários: Introduz a necessidade de login, senhas, sessões e permissões, o que foge do escopo inicial.
+* `despesas.txt`: Armazena todas as despesas cadastradas, usando um formato CSV que inclui o tipo da classe (ex: "Moradia") para recriação polimórfica.
+* `usuarios.txt`: Armazena os usuários, incluindo o login e o hash SHA-256 da senha.
 
-## Projeto do MVP (Minimum Viable Product)
-# Com base nas prioridades altas, o MVP (Produto Mínimo Viável) será a primeira versão realmente usável do sistema e se concentrará em duas ações principais:
-O usuário pode cadastrar uma nova despesa.
-O usuário pode listar todas as despesas em aberto.
-Passos Técnicos para o MVP
-# Modelagem (Model):
-Criar a classe de entidade Despesa.java (com atributos como nome, valor, dataVencimento, paga).
-Criar uma classe TipoDespesa.java (com id, nome).
-# Armazenamento (Controller/Service):
-Criar uma classe GerenciadorDespesas.java que simulará um banco de dados.
-Esta classe terá um ArrayList<Despesa> estático para armazenar as despesas em memória durante a execução do programa.
-# Telas (View):
-Criar a tela TelaCadastroDespesa.java (um JFrame ou JDialog) com formulário (JTextField, JComboBox) para preencher os dados de uma Despesa.
-Criar a tela TelaListarDespesas.java (usando um JTable ou JTextArea) para exibir as despesas salvas no GerenciadorDespesas.
-# Integração:
-Modificar o MenuPrincipal.java para que os botões "Entrar despesa" e "Listar despesas em aberto" abram as novas telas criadas, em vez de apenas imprimir no console.
+**Nota:** O plano original incluía um `tipos_despesa.txt`. Este arquivo não é mais usado, pois a lógica de "Tipos" foi substituída pela arquitetura de Herança (onde cada tipo é uma Classe).
