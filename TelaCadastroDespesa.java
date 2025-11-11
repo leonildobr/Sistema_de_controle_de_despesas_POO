@@ -13,11 +13,13 @@ public class TelaCadastroDespesa extends JDialog implements ActionListener {
     private JTextField txtNome;
     private JTextField txtValor;
     private JTextField txtDataVencimento; // Formato "dd/MM/yyyy"
-    private JComboBox<TipoDespesa> cbTipoDespesa;
+    private JComboBox<String> cbTipoDespesa;
     private JButton btnSalvar;
     private JButton btnCancelar;
 
     private Despesa despesaParaEditar;
+
+    private final String[] TIPOS_DISPONIVEIS = {"Moradia", "Alimentação"};
 
     public TelaCadastroDespesa() {
         setTitle("1. Entrar Despesa (MVP)");
@@ -42,8 +44,7 @@ public class TelaCadastroDespesa extends JDialog implements ActionListener {
         painelFormulario.add(txtDataVencimento);
 
         painelFormulario.add(new JLabel("Tipo:"));
-        List<TipoDespesa> tipos = GerenciadorDespesas.getTiposDespesa();
-        cbTipoDespesa = new JComboBox<>(tipos.toArray(new TipoDespesa[0]));
+        cbTipoDespesa = new JComboBox<>(TIPOS_DISPONIVEIS);
         painelFormulario.add(cbTipoDespesa);
 
         add(painelFormulario, BorderLayout.CENTER);
@@ -72,10 +73,8 @@ public class TelaCadastroDespesa extends JDialog implements ActionListener {
         txtDataVencimento.setText(despesaParaEditar.getDataVencimento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
 
         for (int i = 0; i < cbTipoDespesa.getItemCount(); i++) {
-            if (cbTipoDespesa.getItemAt(i).equals(despesaParaEditar.getTipo())) {
-                cbTipoDespesa.setSelectedIndex(i);
-                break;
-            }
+            cbTipoDespesa.setSelectedItem(despesaParaEditar.getTipoNome());
+            cbTipoDespesa.setEnabled(false);
         }
     }
 
@@ -92,7 +91,7 @@ public class TelaCadastroDespesa extends JDialog implements ActionListener {
         String nome = txtNome.getText();
         String valorStr = txtValor.getText();
         String dataStr = txtDataVencimento.getText();
-        TipoDespesa tipo = (TipoDespesa) cbTipoDespesa.getSelectedItem();
+        String tipoSelecionado = (String) cbTipoDespesa.getSelectedItem();
 
         if (nome.isEmpty() || valorStr.isEmpty() || dataStr.isEmpty()) {
             JOptionPane.showMessageDialog(this,
@@ -107,18 +106,28 @@ public class TelaCadastroDespesa extends JDialog implements ActionListener {
             LocalDate dataVencimento = LocalDate.parse(dataStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
             if (despesaParaEditar == null) {
-                Despesa novaDespesa = new Despesa(nome, valor, dataVencimento, tipo);
-                GerenciadorDespesas.adicionarDespesa(novaDespesa);
-                JOptionPane.showMessageDialog(this,
-                        "Despesa '" + nome + "' salva com sucesso!",
-                        "Sucesso",
-                        JOptionPane.INFORMATION_MESSAGE);
+                // --- MODO CRIAÇÃO (com switch) ---
+                Despesa novaDespesa = null;
+
+                switch (tipoSelecionado) {
+                    case "Moradia":
+                        novaDespesa = new DespesaMoradia(nome, valor, dataVencimento);
+                        break;
+                    case "Alimentação":
+                        novaDespesa = new DespesaAlimentacao(nome, valor, dataVencimento);
+                        break;
+                    // Adicione outros 'case' aqui
+                }
+
+                if (novaDespesa != null) {
+                    GerenciadorDespesas.adicionarDespesa(novaDespesa);
+                    JOptionPane.showMessageDialog(this, "Despesa '" + nome + "' salva com sucesso!");
+                }
+
             } else {
-                GerenciadorDespesas.editarDespesa(despesaParaEditar, nome, valor, dataVencimento, tipo);
-                JOptionPane.showMessageDialog(this,
-                        "Despesa '" + nome + "' atualizada com sucesso!",
-                        "Sucesso",
-                        JOptionPane.INFORMATION_MESSAGE);
+                // --- MODO EDIÇÃO (chama a nova assinatura) ---
+                GerenciadorDespesas.editarDespesa(despesaParaEditar, nome, valor, dataVencimento);
+                JOptionPane.showMessageDialog(this, "Despesa '" + nome + "' atualizada com sucesso!");
             }
 
             dispose();

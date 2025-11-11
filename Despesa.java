@@ -1,35 +1,37 @@
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class Despesa {
-    private static int proximoId = 1;
-    private int id;
-    private String nome;
-    private double valor;
-    private LocalDate dataVencimento;
-    private LocalDate dataEmissao;
-    private LocalDate dataPagamento;
-    private TipoDespesa tipo;
-    private boolean paga;
+public abstract class Despesa implements Pagavel {
 
-    public Despesa(String nome, double valor, LocalDate dataVencimento, TipoDespesa tipo) {
+    private static int proximoId = 1;
+
+    protected int id;
+    protected String nome;
+    protected double valor;
+    protected LocalDate dataVencimento;
+    protected LocalDate dataEmissao;
+    protected LocalDate dataPagamento;
+    protected boolean paga;
+
+
+    public abstract String getTipoNome();
+
+    public Despesa(String nome, double valor, LocalDate dataVencimento) {
         this.id = proximoId++;
         this.nome = nome;
         this.valor = valor;
         this.dataVencimento = dataVencimento;
-        this.tipo = tipo;
         this.dataEmissao = LocalDate.now();
         this.paga = false;
         this.dataPagamento = null;
     }
 
-    public Despesa(int id, String nome, double valor, LocalDate dataVencimento, TipoDespesa tipo,
+    public Despesa(int id, String nome, double valor, LocalDate dataVencimento,
                    LocalDate dataEmissao, boolean paga, LocalDate dataPagamento) {
         this.id = id;
         this.nome = nome;
         this.valor = valor;
         this.dataVencimento = dataVencimento;
-        this.tipo = tipo;
         this.dataEmissao = dataEmissao;
         this.paga = paga;
         this.dataPagamento = dataPagamento;
@@ -43,34 +45,41 @@ public class Despesa {
         String dataPagStr = (dataPagamento == null) ? "null" : dataPagamento.toString();
 
         return String.join(",",
+                getTipoNome(), // <-- MUDANÇA PRINCIPAL AQUI
                 String.valueOf(id),
                 nome,
                 String.valueOf(valor),
                 dataVencimento.toString(),
-                String.valueOf(tipo.getId()),
                 dataEmissao.toString(),
                 String.valueOf(paga),
                 dataPagStr
         );
     }
 
+    @Override
+    public void marcarComoPaga(LocalDate dataPagamento) {
+        this.paga = true;
+        this.dataPagamento = dataPagamento;
+    }
+
+    @Override
+    public boolean isPaga() {
+        return paga;
+    }
+
+    @Override
+    public double getValor() {
+        return valor;
+    }
+
     public int getId() { return id; }
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
-    public double getValor() { return valor; }
     public void setValor(double valor) { this.valor = valor; }
     public LocalDate getDataVencimento() { return dataVencimento; }
     public void setDataVencimento(LocalDate dataVencimento) { this.dataVencimento = dataVencimento; }
     public LocalDate getDataEmissao() { return dataEmissao; }
     public LocalDate getDataPagamento() { return dataPagamento; }
-    public TipoDespesa getTipo() { return tipo; }
-    public void setTipo(TipoDespesa tipo) { this.tipo = tipo; }
-    public boolean isPaga() { return paga; }
-
-    public void marcarComoPaga(LocalDate dataPagamento) {
-        this.paga = true;
-        this.dataPagamento = dataPagamento;
-    }
 
     @Override
     public String toString() {

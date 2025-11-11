@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class TelaListarDespesas extends JDialog implements ActionListener, ListSelectionListener {
 
     private JComboBox<String> cbFiltroStatus;
-    private JComboBox<TipoDespesa> cbFiltroCategoria;
+    private JComboBox<String> cbFiltroCategoria;
     private JButton btnFiltrar;
     private JTable tabela;
     private DefaultTableModel modeloTabela;
@@ -24,6 +24,8 @@ public class TelaListarDespesas extends JDialog implements ActionListener, ListS
     private JButton btnFechar;
 
     private List<Despesa> despesasExibidas;
+
+    private final String[] TIPOS_DISPONIVEIS = {"Todas", "Moradia", "Alimentação"};
 
     public TelaListarDespesas() {
         setTitle("3. Listar e Gerenciar Despesas");
@@ -40,10 +42,7 @@ public class TelaListarDespesas extends JDialog implements ActionListener, ListS
         painelFiltros.add(cbFiltroStatus);
 
         painelFiltros.add(new JLabel("Categoria:"));
-        List<TipoDespesa> tipos = new ArrayList<>();
-        tipos.add(new TipoDespesa("Todas")); // ID = 0 (implícito)
-        tipos.addAll(GerenciadorDespesas.getTiposDespesa());
-        cbFiltroCategoria = new JComboBox<>(tipos.toArray(new TipoDespesa[0]));
+        cbFiltroCategoria = new JComboBox<>(TIPOS_DISPONIVEIS);
         painelFiltros.add(cbFiltroCategoria);
 
         btnFiltrar = new JButton("Filtrar");
@@ -95,7 +94,7 @@ public class TelaListarDespesas extends JDialog implements ActionListener, ListS
 
     private void atualizarTabela() {
         String status = (String) cbFiltroStatus.getSelectedItem();
-        TipoDespesa categoria = (TipoDespesa) cbFiltroCategoria.getSelectedItem();
+        String categoria = (String) cbFiltroCategoria.getSelectedItem();
 
         List<Despesa> despesasBase;
         if (status.equals("Em Aberto")) {
@@ -106,9 +105,9 @@ public class TelaListarDespesas extends JDialog implements ActionListener, ListS
             despesasBase = GerenciadorDespesas.getTodasDespesas();
         }
 
-        if (categoria != null && !categoria.getNome().equals("Todas")) {
+        if (categoria != null && !categoria.equals("Todas")) {
             despesasExibidas = despesasBase.stream()
-                    .filter(d -> d.getTipo().equals(categoria))
+                    .filter(d -> d.getTipoNome().equals(categoria))
                     .collect(Collectors.toList());
         } else {
             despesasExibidas = despesasBase;
@@ -123,7 +122,7 @@ public class TelaListarDespesas extends JDialog implements ActionListener, ListS
             linha.add(d.getNome());
             linha.add(String.format("R$ %.2f", d.getValor()));
             linha.add(d.getDataVencimento().format(formatadorData));
-            linha.add(d.getTipo().getNome());
+            linha.add(d.getTipoNome());
             linha.add(d.isPaga() ? "Paga" : "Em Aberto");
             modeloTabela.addRow(linha);
         }

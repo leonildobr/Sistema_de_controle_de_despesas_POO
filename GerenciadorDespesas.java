@@ -2,16 +2,18 @@ import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GerenciadorDespesas {
 
     private static final String ARQUIVO_DESPESAS = "despesas.txt";
 
-    private static List<TipoDespesa> listaTipos = GerenciadorDeArquivos.carregarTipos();
     private static List<Despesa> listaDespesas = carregarDespesas();
 
+    /**
+     * Carrega as despesas do arquivo.
+     * Esta é a mudança principal: ele usa Polimorfismo.
+     */
     private static List<Despesa> carregarDespesas() {
         List<Despesa> despesas = new ArrayList<>();
         File file = new File(ARQUIVO_DESPESAS);
@@ -19,8 +21,7 @@ public class GerenciadorDespesas {
 
         if (!file.exists()) {
             System.out.println("LOG: Arquivo de despesas não encontrado. Criando um novo...");
-            // Não precisa criar dados de exemplo, pois o MenuPrincipal fará isso
-            return despesas; // Retorna lista vazia
+            return despesas;
         }
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -30,24 +31,33 @@ public class GerenciadorDespesas {
 
                 String[] partes = linha.split(",");
                 if (partes.length == 8) {
-                    int id = Integer.parseInt(partes[0]);
-                    String nome = partes[1];
-                    double valor = Double.parseDouble(partes[2]);
-                    LocalDate dataVenc = LocalDate.parse(partes[3]);
-                    int tipoId = Integer.parseInt(partes[4]);
+
+                    String tipoNome = partes[0];
+                    int id = Integer.parseInt(partes[1]);
+                    String nome = partes[2];
+                    double valor = Double.parseDouble(partes[3]);
+                    LocalDate dataVenc = LocalDate.parse(partes[4]);
                     LocalDate dataEmissao = LocalDate.parse(partes[5]);
                     boolean paga = Boolean.parseBoolean(partes[6]);
                     LocalDate dataPag = partes[7].equals("null") ? null : LocalDate.parse(partes[7]);
 
-                    // Busca o objeto TipoDespesa correspondente ao ID
-                    TipoDespesa tipo = buscarTipoPorId(tipoId);
+                    Despesa d = null;
 
-                    if (tipo != null) {
-                        Despesa d = new Despesa(id, nome, valor, dataVenc, tipo, dataEmissao, paga, dataPag);
+                    switch (tipoNome) {
+                        case "Moradia":
+                            d = new DespesaMoradia(id, nome, valor, dataVenc, dataEmissao, paga, dataPag);
+                            break;
+                        case "Alimentação":
+                            d = new DespesaAlimentacao(id, nome, valor, dataVenc, dataEmissao, paga, dataPag);
+                            break;
+                        default:
+                            System.err.println("Erro: Tipo de despesa desconhecido: " + tipoNome);
+                            break;
+                    }
+
+                    if (d != null) {
                         despesas.add(d);
                         if (id > maxId) maxId = id;
-                    } else {
-                        System.err.println("Erro: Tipo de despesa com ID " + tipoId + " não encontrado para a despesa " + nome);
                     }
                 }
             }
@@ -70,58 +80,16 @@ public class GerenciadorDespesas {
         }
     }
 
-    private static TipoDespesa buscarTipoPorId(int id) {
-        for (TipoDespesa tipo : listaTipos) {
-            if (tipo.getId() == id) {
-                return tipo;
-            }
-        }
-        return listaTipos.stream().findFirst().orElse(null);
-    }
-
-    public static List<TipoDespesa> getTiposDespesa() {
-        return listaTipos;
-    }
-
-    public static void adicionarTipoDespesa(String nome) {
-        TipoDespesa novoTipo = new TipoDespesa(nome);
-        listaTipos.add(novoTipo);
-        GerenciadorDeArquivos.salvarTipos(listaTipos);
-        System.out.println("LOG: Tipo de despesa adicionado: " + nome);
-    }
-
-    public static void editarTipoDespesa(TipoDespesa tipo, String novoNome) {
-        tipo.setNome(novoNome);
-        GerenciadorDeArquivos.salvarTipos(listaTipos);
-        System.out.println("LOG: Tipo de despesa editado para: " + novoNome);
-    }
-
-    public static boolean excluirTipoDespesa(TipoDespesa tipo) {
-        boolean emUso = listaDespesas.stream()
-                .anyMatch(despesa -> despesa.getTipo().equals(tipo));
-
-        if (emUso) {
-            System.out.println("LOG: Tentativa de excluir tipo '" + tipo.getNome() + "', mas está em uso.");
-            return false;
-        }
-
-        listaTipos.remove(tipo);
-        GerenciadorDeArquivos.salvarTipos(listaTipos);
-        System.out.println("LOG: Tipo de despesa removido: " + tipo.getNome());
-        return true; // Excluído com sucesso
-    }
-
     public static void adicionarDespesa(Despesa d) {
         listaDespesas.add(d);
         salvarDespesas();
         System.out.println("LOG: Despesa adicionada e salva: " + d.getNome());
     }
 
-    public static void editarDespesa(Despesa despesa, String nome, double valor, LocalDate dataVenc, TipoDespesa tipo) {
+    public static void editarDespesa(Despesa despesa, String nome, double valor, LocalDate dataVenc) {
         despesa.setNome(nome);
         despesa.setValor(valor);
         despesa.setDataVencimento(dataVenc);
-        despesa.setTipo(tipo);
         salvarDespesas();
         System.out.println("LOG: Despesa editada e salva: " + despesa.getNome());
     }
@@ -134,24 +102,25 @@ public class GerenciadorDespesas {
 
     public static List<Despesa> getTodasDespesasEmAberto() {
         return listaDespesas.stream()
-                .filter(d -> !d.isPaga()) // Filtra apenas as NÃO PAGAS
+                .filter(d -> !d.isPaga())
                 .collect(Collectors.toList());
     }
 
     public static List<Despesa> getTodasDespesas() {
-        return listaDespesas; // Retorna a lista completa
+        return listaDespesas;
     }
 
     public static List<Despesa> getTodasDespesasPagas() {
         return listaDespesas.stream()
-                .filter(d -> d.isPaga()) // Filtra apenas as PAGAS
+                .filter(Despesa::isPaga)
                 .collect(Collectors.toList());
     }
 
     public static void excluirDespesa(Despesa despesa) {
         if (despesa != null) {
             listaDespesas.remove(despesa);
-            System.out.println("LOG: Despesa removida: " + despesa.getNome());
+            salvarDespesas();
+            System.out.println("LOG: Despesa removida e salva: " + despesa.getNome());
         }
     }
 }
