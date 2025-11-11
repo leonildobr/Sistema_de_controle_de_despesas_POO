@@ -1,4 +1,4 @@
-1,Conta de Luz,150.75,2025-11-15,1,2025-11-10,false,null
-2,Supermercado,450.0,2025-11-12,2,2025-11-10,false,null
-3,Aluguel,1200.0,2025-11-20,1,2025-11-10,false,null
-4,Internet (Mês Passado),99.9,2025-10-21,1,2025-11-10,true,2025-10-22
+Moradia,1,Conta de Luz,150.75,2025-11-15,2025-11-10,false,null
+Alimentação,2,Supermercado,450.0,2025-11-12,2025-11-10,false,null
+Moradia,3,Aluguel,1200.0,2025-11-20,2025-11-10,false,null
+Moradia,4,Internet (Mês Passado),99.9,2025-10-21,2025-11-10,true,2025-10-22

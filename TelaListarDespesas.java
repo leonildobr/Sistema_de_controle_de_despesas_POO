@@ -24,10 +24,24 @@ public class TelaListarDespesas extends JDialog implements ActionListener, ListS
     private JButton btnFechar;
 
     private List<Despesa> despesasExibidas;
+    private String filtroStatusPadrao;
 
     private final String[] TIPOS_DISPONIVEIS = {"Todas", "Moradia", "Alimentação"};
 
     public TelaListarDespesas() {
+        this.filtroStatusPadrao = "Todas"; // Define "Todas" como padrão
+        inicializarComponentes();
+    }
+
+    public TelaListarDespesas(String filtroStatusPadrao) {
+        this.filtroStatusPadrao = filtroStatusPadrao; // Define o filtro recebido
+        inicializarComponentes();
+    }
+
+    private void inicializarComponentes() {
+        setTitle("3. Listar e Gerenciar Despesas");
+        setSize(800, 600);
+        setLocationRelativeTo(null);
         setTitle("3. Listar e Gerenciar Despesas");
         setSize(800, 600);
         setLocationRelativeTo(null);
@@ -39,6 +53,7 @@ public class TelaListarDespesas extends JDialog implements ActionListener, ListS
 
         painelFiltros.add(new JLabel("Status:"));
         cbFiltroStatus = new JComboBox<>(new String[]{"Todas", "Em Aberto", "Pagas"});
+        cbFiltroStatus.setSelectedItem(this.filtroStatusPadrao);
         painelFiltros.add(cbFiltroStatus);
 
         painelFiltros.add(new JLabel("Categoria:"));
@@ -86,7 +101,6 @@ public class TelaListarDespesas extends JDialog implements ActionListener, ListS
         btnFechar = new JButton("Voltar (Fechar)");
         btnFechar.addActionListener(this);
         painelBotoes.add(btnFechar);
-
         add(painelBotoes, BorderLayout.SOUTH);
 
         atualizarTabela();

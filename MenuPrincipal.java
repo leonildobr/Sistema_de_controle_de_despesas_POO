@@ -30,9 +30,10 @@ public class MenuPrincipal extends JFrame implements ActionListener {
             botao.addActionListener(this);
 
             if (!opcao.equals("Entrar despesa") &&
-                    !opcao.equals("Listar despesas em aberto no período") && // Você pode habilitar "Listar pagas" aqui se quiser
+                    !opcao.equals("Listar despesas em aberto no período") &&
+                    !opcao.equals("Listar despesas pagas no período") &&                    !opcao.equals("Anotar pagamento") &&
+                    // !opcao.equals("gerenciar tipos de despesas") &&
                     !opcao.equals("Anotar pagamento") &&
-                    // !opcao.equals("gerenciar tipos de despesas") && // <-- REMOVIDO
                     !opcao.equals("gerenciar Usuários") &&
                     !opcao.equals("Sair")) {
 
@@ -82,7 +83,10 @@ public class MenuPrincipal extends JFrame implements ActionListener {
             new TelaCadastroDespesa().setVisible(true);
 
         } else if (comando.equals("Listar despesas em aberto no período")) {
-            new TelaListarDespesas().setVisible(true);
+            new TelaListarDespesas("Em Aberto").setVisible(true);
+
+        } else if (comando.equals("Listar despesas pagas no período")) {
+            new TelaListarDespesas("Pagas").setVisible(true);
 
         } else if (comando.equals("Anotar pagamento")) {
             new TelaAnotarPagamento().setVisible(true);
